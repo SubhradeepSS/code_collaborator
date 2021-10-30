@@ -18,7 +18,10 @@
     "framer-motion": "^4.1.17",
     "next": "12.0.1",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-ace": "^9.5.0",
+    "react-dom": "17.0.2",
+    "socket.io-client": "^4.3.2",
+    "timeago.js": "^4.0.2"
   },
   "devDependencies": {
     "@types/react": "^17.0.33",

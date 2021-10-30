@@ -1,4 +1,4 @@
-import CreateRoom from "../components/CreateRoom";
+import CreateRoom from "../components/room/CreateRoom";
 import Navbar from "../components/Navbar";
 import LoadingPage from "../components/LoadingPage";
 

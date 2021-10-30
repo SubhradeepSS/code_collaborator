@@ -1,4 +1,4 @@
-import JoinRoom from "../components/JoinRoom";
+import JoinRoom from "../components/room/JoinRoom";
 import Navbar from "../components/Navbar";
 import LoadingPage from "../components/LoadingPage";
 
