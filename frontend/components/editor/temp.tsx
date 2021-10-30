@@ -90,10 +90,7 @@ const fontSizes = [
 ];
 
 export default function CompilerCnntroller({ roomId }): JSX.Element {
-	const { user } = useAuth0();
 	// states
-
-	const [number, setnumber] = useState("");
 	const [language, setLanguage] = useState<string>("python");
 	const [theme, setTheme] = useState<string>("monokai");
 	const [fontSize, setFontSize] = useState<string>("20");
@@ -103,8 +100,6 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 	const [statusId, setStatusId] = useState<String>("");
 	const [status, setStatus] = useState<String>("idel");
 	const [isRunning, setIsRunning] = useState<boolean>(false);
-	const { isOpen, onOpen, onClose } = useDisclosure();
-
 	const [data, setData] = useState({
 		time: "0.00",
 		result: "idel",
@@ -120,16 +115,6 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 	const router = useRouter();
 	const { id } = router.query;
 
-	const [show, setShow] = useState(false);
-
-	const handleClose = () => setShow(false);
-	const handleShow = () => {
-		console.log("df");
-		setShow(true);
-	};
-
-	useEffect(() => {}, [show]);
-
 	useEffect(() => {
 		if (typeof window !== undefined) {
 			const getCode = async () => {
@@ -142,15 +127,6 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 		}
 	}, []);
 
-	const onShare = () => {
-		ServerApi.post("/api/shareCode", { phone: number, code: code });
-	};
-
-	const onLeave = () => {
-		ServerApi.post("/api/room/exitRoom", { email: user.email, roomId: id });
-		Router.push("/");
-	};
-
 	// Run Program
 	const getOutput = async (statusId: string | String) => {
 		if (statusId == "") return;
@@ -162,13 +138,13 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 			if (stdout) newOutput += stdout;
 			if (stderr) newOutput += stderr;
 			if (build_stderr) newOutput += build_stderr;
+
 			setOutput(newOutput);
 			SOCKET_IO.emit("output", newOutput, id);
 			setData({ time: response.data.time, result: response.data.result });
 			if (response.data.status != "completed") {
 				await getOutput(statusId);
 			}
-
 			setStatus("completed");
 			setIsRunning(false);
 			setStatusId("");
@@ -251,117 +227,95 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 	return (
 		<>
 			{/* Editor's Navbar- Controls */}
+			<div style={{ background: "", padding: "5px 0" }}>
+				<Wrap spacing="-10px" justify="space-around">
+					<WrapItem>
+						<FormControl>
+							<Center>
+								<FormLabel my="0">Choose Language</FormLabel>
+							</Center>
+							<Select
+								defaultValue={language}
+								value={language}
+								minW="230px"
+								name="mode"
+								onChange={(e) => {
+									SOCKET_IO.emit("language", e.target.value, id);
+									setLanguage(e.target.value);
+								}}>
+								{languages.map((lang, index) => {
+									return (
+										<option key={index} value={lang}>
+											{lang}
+										</option>
+									);
+								})}
+							</Select>
+						</FormControl>
+					</WrapItem>
+					<WrapItem>
+						<FormControl>
+							<Center>
+								<FormLabel my="0">Choose Theme</FormLabel>
+							</Center>
+							<Select
+								defaultValue={theme}
+								minW="230px"
+								name="theme"
+								onChange={(e) => setTheme(e.target.value)}>
+								{themes.map((th) => (
+									<option key={th} value={th}>
+										{th}
+									</option>
+								))}
+							</Select>
+						</FormControl>
+					</WrapItem>
 
-			<SimpleGrid
-				minChildWidth="120px"
-				style={{ padding: "30px" }}
-				spacing="40px">
-				<FormControl>
+					<WrapItem>
+						<FormControl>
+							<Center>
+								<FormLabel my="0">Font Size</FormLabel>
+							</Center>
+							<Select
+								defaultValue={fontSize}
+								minW="150px"
+								name="fontSize"
+								onChange={(e) => setFontSize(e.target.value)}>
+								{fontSizes.map((fSize, index) => {
+									return (
+										<option key={index} value={fSize}>
+											{fSize}
+										</option>
+									);
+								})}
+							</Select>
+						</FormControl>
+					</WrapItem>
 					<Center>
-						<FormLabel my="0">Choose Language</FormLabel>
-					</Center>
-					<Select
-						defaultValue={language}
-						name="mode"
-						value={language}
-						onChange={(e) => {
-							SOCKET_IO.emit("language", e.target.value, id);
-							setLanguage(e.target.value);
-						}}>
-						{languages.map((lang, index) => {
-							return (
-								<option key={index} value={lang}>
-									{lang}
-								</option>
-							);
-						})}
-					</Select>
-				</FormControl>
-				<FormControl>
-					<Center>
-						<FormLabel my="0">Choose Theme</FormLabel>
-					</Center>
-					<Select
-						defaultValue={theme}
-						name="theme"
-						onChange={(e) => setTheme(e.target.value)}>
-						{themes.map((th) => (
-							<option key={th} value={th}>
-								{th}
-							</option>
-						))}
-					</Select>
-				</FormControl>
-				<FormControl>
-					<Center>
-						<FormLabel my="0">Font Size</FormLabel>
-					</Center>
-					<Select
-						defaultValue={fontSize}
-						name="fontSize"
-						onChange={(e) => setFontSize(e.target.value)}>
-						{fontSizes.map((fSize, index) => {
-							return (
-								<option key={index} value={fSize}>
-									{fSize}
-								</option>
-							);
-						})}
-					</Select>
-				</FormControl>
-
-				<Button
-					colorScheme="teal"
-					variant="solid"
-					isLoading={isRunning}
-					loadingText="Running..."
-					onClick={onRun}>
-					Save and Run
-				</Button>
-
-				<Button colorScheme="teal" variant="solid" onClick={onCopy}>
-					Copy RoomInfo
-				</Button>
-
-				<Button colorScheme="red" variant="solid" onClick={onLeave}>
-					Leave Room
-				</Button>
-
-				<WhatsappIcon onClick={onOpen} size={42} round={true} />
-
-				<Modal isOpen={isOpen} onClose={onClose}>
-					<ModalOverlay />
-					<ModalContent>
-						<ModalHeader>Modal Title</ModalHeader>
-						<ModalCloseButton />
-						<ModalBody>
-							{" "}
-							<FormControl mt={6}>
-								<FormLabel>Whatsapp Number</FormLabel>
-								<Input
-									type="string"
-									value={number}
-									onChange={(e) => {
-										setnumber(e.target.value);
-									}}
-									placeholder="Enter whatsapp number"
-									_placeholder={{ color: "gray.500" }}
-								/>
-							</FormControl>
-						</ModalBody>
-
-						<ModalFooter>
-							<Button colorScheme="blue" mr={3} onClick={onClose}>
-								Close
+						<WrapItem>
+							<Button
+								colorScheme="teal"
+								variant="solid"
+								isLoading={isRunning}
+								loadingText="Running..."
+								onClick={onRun}>
+								Save and Run
 							</Button>
-							<Button variant="ghost" onClick={onShare}>
-								Share
+						</WrapItem>
+					</Center>
+					{/* <Center>
+                <WrapItem>Status : {status}</WrapItem>
+              </Center> */}
+					<Center>
+						<WrapItem>
+							<Button colorScheme="teal" variant="solid" onClick={onCopy}>
+								Copy Room Info
 							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			</SimpleGrid>
-
+						</WrapItem>
+					</Center>
+				</Wrap>
+			</div>
 			<hr />
 
 			{/* Editor with Input and Output section */}
@@ -377,11 +331,9 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 								value={code} // ! Bug: python -> after enter editor it is not indented by default
 								onChange={(e) => {
 									onChangeEditor(e);
-									// setCode(e);
-									// SOCKET_IO.emit("editor", code);
 								}}
 								height={"69vh"}
-								width={"40vw"}
+								width={"44vw"}
 								fontSize={parseInt(fontSize, 10)}
 								setOptions={{
 									enableBasicAutocompletion: true,
@@ -402,7 +354,7 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 								]}
 							/>
 						</Box>
-						<Box p={8}>
+						<Box p={4}>
 							<Box mb={4}>
 								<Text>Input</Text>
 								<Editor
