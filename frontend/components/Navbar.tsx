@@ -19,7 +19,19 @@ const Links = [
   ["Create Room", "/createroom"],
   ["Join Room", "/joinroom"],
 ];
-
+const NavLinkWithHoverEffect = ({ children }: { children: ReactNode }) => (
+  <Link
+    px={2}
+    py={1}
+    rounded={"md"}
+    _hover={{
+      textDecoration: "none",
+      bg: useColorModeValue("gray.200", "gray.700"),
+    }}
+  >
+    {children}
+  </Link>
+);
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
     px={2}
@@ -54,10 +66,10 @@ export default function withAction() {
             display={{ md: "none" }}
             onClick={isOpen ? onClose : onOpen}
           />
-          <HStack spacing={8} alignItems={"left"}>
+          <HStack spacing={8} alignItems={"center"}>
             <i>
               <Box>
-                <strong>ChatCollaborator</strong>
+                <strong>Chat-Collaborator</strong>
               </Box>
             </i>{" "}
             {Links.map((link) => (
@@ -78,7 +90,9 @@ export default function withAction() {
                   </strong>
                 </Box>
                 <Box>
-                  <ColorModeSwitch />
+                  <NavLinkWithHoverEffect>
+                    <ColorModeSwitch />
+                  </NavLinkWithHoverEffect>
                 </Box>{" "}
                 <LogoutButton />
               </>
