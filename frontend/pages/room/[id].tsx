@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, GridItem, Box } from "@chakra-ui/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Chat, ChatButton } from "../../components/chat/Chat";
@@ -7,15 +7,28 @@ import CompilerController from "../../components/editor/CompilerController";
 import { useRouter } from "next/router";
 import LoadingPage from "../../components/LoadingPage";
 
-const Room = (props) => {
-	const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+import { SOCKET_IO } from "../../utils/constants";
 
+const Room = (props) => {
 	const [isChatOpen, setIsChatOpen] = useState(true);
 	const [editorSize, setEditorSize] = useState(8);
 	const [chatSize, setChatSize] = useState(2);
 
 	const router = useRouter();
 	const { id } = router.query;
+
+	const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+	const { user } = useAuth0();
+
+	useEffect(() => {
+		if (!isLoading && id) SOCKET_IO.emit("joinRoom", id, user.email);
+	}, [isLoading, id, user]);
+
+	useEffect(() => {
+		SOCKET_IO.on("userConnected", (roomId: string, user: string) => {
+			console.log("user connetced", roomId, user);
+		});
+	});
 
 	const manageSize = () => {
 		if (isChatOpen) {

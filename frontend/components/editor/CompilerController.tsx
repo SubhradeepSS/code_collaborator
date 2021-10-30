@@ -121,16 +121,18 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 		try {
 			let response = await API.get(`/get_details?id=${statusId}&api_key=guest`);
 			console.log(response);
-			const { stdout, stderr } = response.data;
+			const { stdout, stderr, build_stderr } = response.data;
 			let newOutput = "";
 			if (stdout) newOutput += stdout;
 			if (stderr) newOutput += stderr;
+			if (build_stderr) newOutput += build_stderr;
+
 			setOutput(newOutput);
+			SOCKET_IO.emit("output", newOutput, id);
 			setData({ time: response.data.time, result: response.data.result });
 			if (response.data.status != "completed") {
 				await getOutput(statusId);
 			}
-
 			setStatus("completed");
 			setIsRunning(false);
 			setStatusId("");
@@ -171,18 +173,29 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 	};
 
 	useEffect(() => {
-		SOCKET_IO.on("editor", (msg: string) => {
+		SOCKET_IO.on("editor", (msg: string, roomId: string) => {
 			setCode(msg);
 		});
 	});
 
+	useEffect(() => {
+		SOCKET_IO.on("input", (msg: string, roomId: string) => {
+			setInput(msg);
+		});
+	});
+
+	useEffect(() => {
+		SOCKET_IO.on("language", (msg: string, roomId: string) => {
+			setLanguage(msg);
+		});
+	});
 	const onChangeEditor = (e) => {
-		SOCKET_IO.emit("editor", e);
+		SOCKET_IO.emit("editor", e, id);
 	};
 
 	useEffect(() => {
-		console.log(output);
-		SOCKET_IO.on("output", (msg: string) => {
+		//console.log(output);
+		SOCKET_IO.on("output", (msg: string, roomId: string) => {
 			setOutput(msg);
 		});
 	}, [output]);
@@ -196,7 +209,7 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 			const res = await axios.post(SERVER_URL + "/code", data);
 		},
 		[code],
-		10000
+		5000
 	);
 
 	return (
@@ -211,9 +224,13 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 							</Center>
 							<Select
 								defaultValue={language}
+								value={language}
 								minW="230px"
 								name="mode"
-								onChange={(e) => setLanguage(e.target.value)}>
+								onChange={(e) => {
+									SOCKET_IO.emit("language", e.target.value, id);
+									setLanguage(e.target.value);
+								}}>
 								{languages.map((lang, index) => {
 									return (
 										<option key={index} value={lang}>
@@ -302,8 +319,6 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 								value={code} // ! Bug: python -> after enter editor it is not indented by default
 								onChange={(e) => {
 									onChangeEditor(e);
-									// setCode(e);
-									// SOCKET_IO.emit("editor", code);
 								}}
 								height={"69vh"}
 								width={"44vw"}
@@ -335,7 +350,10 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
 									theme={theme}
 									value={input}
 									//   fontSize={fontSize}
-									onChange={(e) => setInput(e)}
+									onChange={(e) => {
+										setInput(e);
+										SOCKET_IO.emit("input", e, id);
+									}}
 									height={"32vh"}
 									width={"28vw"}
 									fontSize={parseInt(fontSize, 10)}
