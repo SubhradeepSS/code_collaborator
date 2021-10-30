@@ -15,6 +15,7 @@ const createRoom = async (req, res) => {
     members: [email],
     roomName,
     password,
+    code: "",
   });
 
   try {
@@ -61,7 +62,7 @@ const joinRoom = async (req, res) => {
                 email
               ),
             },
-            { where: { roomId } }
+            { where: { roomId: roomId } }
           );
 
           res.status(200).json({ msg: `joined room` });
@@ -75,11 +76,20 @@ const joinRoom = async (req, res) => {
   }
 };
 
-const codeSave = async (req, _res) => {
-  const { roomId, code } = req.body;
-  console.log(req.body);
-  //   await Room.update({ where: { roomId } }, { code: code });
-  _res.json({ msg: "joined room" });
+const codeSave = async (req, res) => {
+  let { roomId, code } = req.body;
+
+  const room = await Room.findByPk(roomId);
+  room.code = code;
+  await room.save();
+  res.status(200).json({ msg: "code saved", code });
+};
+
+const sendCode = async (req, res) => {
+  let { roomId } = req.params;
+
+  const room = await Room.findByPk(roomId);
+  res.status(200).json({ code: room.code, msg: "getCode" });
 };
 
 const exitRoom = async (req, res) => {
@@ -93,4 +103,11 @@ const exitRoom = async (req, res) => {
   res.status(200).json({ msg: "exit room" });
 };
 
-module.exports = { createRoom, getRoomsOfUser, joinRoom, codeSave, exitRoom };
+module.exports = {
+  createRoom,
+  getRoomsOfUser,
+  joinRoom,
+  codeSave,
+  exitRoom,
+  sendCode,
+};

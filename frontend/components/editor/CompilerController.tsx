@@ -8,8 +8,6 @@ import {
   Select,
   Text,
   SimpleGrid,
-  Wrap,
-  WrapItem,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/router";
@@ -78,7 +76,7 @@ const fontSizes = [
   "45",
 ];
 
-export default function CompilerCnntroller(): JSX.Element {
+export default function CompilerCnntroller({ roomId }): JSX.Element {
   const { user } = useAuth0();
   // states
   const [language, setLanguage] = useState<string>("python");
@@ -107,7 +105,13 @@ export default function CompilerCnntroller(): JSX.Element {
 
   useEffect(() => {
     if (typeof window !== undefined) {
-      setCode(localStorage.getItem("code"));
+      const getCode = async () => {
+        const url = SERVER_URL + "/code/" + roomId;
+        console.log(url);
+        const res = await axios.get(url);
+        setCode(res.data.code);
+      };
+      getCode();
     }
   }, []);
 
@@ -152,6 +156,11 @@ export default function CompilerCnntroller(): JSX.Element {
     setIsRunning(true);
     console.log(code);
     try {
+      const data = {
+        code: code,
+        roomId: id,
+      };
+      await axios.post(SERVER_URL + "/code", data);
       let response = await API.post("/create", {
         source_code: code,
         language: language,
@@ -189,11 +198,10 @@ export default function CompilerCnntroller(): JSX.Element {
         code: code,
         roomId: id,
       };
-      localStorage.setItem("code", code as string);
       const res = await axios.post(SERVER_URL + "/code", data);
     },
     [code],
-    1000
+    10000
   );
 
   return (

@@ -56,7 +56,7 @@ const Room = (props) => {
         templateColumns="repeat(10, 1fr)"
       >
         <GridItem colSpan={editorSize}>
-          <CompilerController />
+          <CompilerController roomId={id as string} />
         </GridItem>
 
         <GridItem colSpan={chatSize}>
