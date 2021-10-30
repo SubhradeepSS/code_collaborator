@@ -76,16 +76,8 @@ export default function JoinRoom(): JSX.Element {
               _placeholder={{ color: "gray.500" }}
             />
           </FormControl>
-          <Text
-            fontSize={{ base: "sm", sm: "md" }}
-            color={useColorModeValue("gray.800", "gray.400")}
-            my="5"
-          >
-            Ask from room host or{" "}
-            <Link color={"blue.400"} href="/createroom">
-              Make your own room
-            </Link>
-          </Text>
+          <br />
+
           <Stack spacing={6}>
             <Button
               onClick={formSubmitEventHandler}
