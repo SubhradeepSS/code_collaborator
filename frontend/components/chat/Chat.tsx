@@ -13,6 +13,7 @@ import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import { SERVER_URL } from "../../utils/constants";
 import { ChatUtility } from "./ChatUtility";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export const ChatButton = () => {
   const { onOpen } = useDisclosure();
@@ -34,20 +35,16 @@ export const ChatButton = () => {
 };
 
 export const Chat: React.FC<{ roomId: string }> = ({ roomId }) => {
+  const { user } = useAuth0();
+
   const [inputState, setInputState] = useState("");
   const [newMessageSubmitted, setNewMessageSubmitted] = useState({});
 
-  const userId = JSON.parse(localStorage.getItem("user"))
-    ? JSON.parse(localStorage.getItem("user")).UserId
-    : "guest";
-
   const submitMessageFn = async (msg: string, roomId: string) => {
-    const userD = JSON.parse(localStorage.getItem("user"));
-
     const message = {
       roomId: roomId,
-      senderId: userId,
-      senderName: userD.UserName,
+      senderId: user.email,
+      senderName: user.name.split(" ")[0],
       text: msg,
     };
 

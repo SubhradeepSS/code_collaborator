@@ -25,7 +25,8 @@ export default function CreateRoom(): JSX.Element {
   const formSubmitEventHandler = () => {
     ServerApi.post("/api/room", { email, roomName, password: roomPassword })
       .then((res) => {
-        location.replace(`/room/${res.data.room.roomId}`);
+        console.log(res.data);
+        location.replace(`/room/${res.data.roomId}`);
       })
       .catch((err) => {
         // handle error

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { format } from "timeago.js";
 import { SERVER_URL } from "../../utils/constants";
 import { SOCKET_IO } from "../../utils/constants";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface ChatUtilityProps {
   currentRoomId: string;
@@ -14,18 +15,16 @@ export const ChatUtility: React.FC<ChatUtilityProps> = ({
   currentRoomId,
   newMessageSubmitted,
 }) => {
+  const { user } = useAuth0();
+
   const [roomState, setRoomState] = useState([]);
   const [messages, setMessages] = useState([]);
 
   const scrollRef = useRef();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"))
-      ? JSON.parse(localStorage.getItem("user")).UserId
-      : "randomId";
-
     const getConversations = async () => {
-      const url = SERVER_URL + "/room/" + user;
+      const url = SERVER_URL + "/room/" + user.email;
       const res = await axios.get(url);
 
       // console.log(res);
