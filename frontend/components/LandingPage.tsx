@@ -1,7 +1,7 @@
 import { Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
-export default function Landing(): JSX.Element {
+export default function LandingPage(): JSX.Element {
   return (
     <Container maxW={"5xl"}>
       <Stack

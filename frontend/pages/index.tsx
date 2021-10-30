@@ -1,12 +1,11 @@
-import styles from "../styles/Home.module.css";
 import Navbar from "../components/Navbar";
-import Landing from "../components/Landing";
+import LandingPage from "../components/LandingPage";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <Landing />
+      <LandingPage />
     </>
   );
 }

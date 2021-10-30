@@ -13,6 +13,7 @@ import { ColorModeSwitch } from "./ColorModeSwitch";
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
+import NextLink from "next/link";
 
 const Links = [
   ["Home", "/"],
@@ -33,18 +34,7 @@ const NavLinkWithHoverEffect = ({ children }: { children: ReactNode }) => (
   </Link>
 );
 const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={children[1]}
-  >
-    {children[0]}
-  </Link>
+  <NextLink href={children[1]}>{children[0]}</NextLink>
 );
 
 export default function withAction() {
