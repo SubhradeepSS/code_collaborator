@@ -1,39 +1,34 @@
-import { useState } from "react";
 import {
   Button,
+  Flex,
   FormControl,
   FormLabel,
-  Flex,
   Heading,
   Input,
+  Link,
   Stack,
   Text,
   useColorModeValue,
-  Link,
 } from "@chakra-ui/react";
-
+import { useState } from "react";
+import { ServerApi } from "../../utils/constants";
 import { useAuth0 } from "@auth0/auth0-react";
-import ServerApi from "../utils/serverInstance";
 
-export default function CreateRoom(): JSX.Element {
+export default function JoinRoom(): JSX.Element {
   const { user } = useAuth0();
 
-  const [userName, setUserName] = useState(user.name);
-  const [roomName, setRoomName] = useState("");
-  const [roomPassword, setRoomPassword] = useState("abc");
+  const [email, setEmail] = useState(user.email);
+  const [roomId, setRoomId] = useState("");
+  const [password, setPassword] = useState("");
 
   const formSubmitEventHandler = () => {
-    ServerApi.post("/api/room", { userName, roomName, password: roomPassword })
+    ServerApi.post("/api/joinRoom", {
+      email,
+      roomId,
+      password: password,
+    })
       .then((res) => {
-        const userData = {
-          UserName: res.data.members[0].name,
-          UserId: res.data.members[0].userId,
-          RoomName: res.data.roomName,
-          RoomId: res.data.roomId,
-        };
-
-        localStorage.setItem("user", JSON.stringify(userData));
-        location.replace(`/room/${res.data.roomId}`);
+        location.replace(`/room/${roomId}`);
       })
       .catch((err) => {
         // handle error
@@ -58,54 +53,39 @@ export default function CreateRoom(): JSX.Element {
         my={12}
       >
         <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
-          Create New Room
+          Join New Room
         </Heading>
-
         <form>
-          <FormControl>
-            <FormLabel>Username</FormLabel>
+          <FormControl mt={6}>
+            <FormLabel>Room Id</FormLabel>
             <Input
               type="string"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder={"Enter username"}
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              placeholder="Enter Room Id"
               _placeholder={{ color: "gray.500" }}
             />
           </FormControl>
-
           <FormControl mt={6}>
-            <FormLabel>Roomname</FormLabel>
-            <Input
-              type="string"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder="Enter Roomname"
-              _placeholder={{ color: "gray.500" }}
-            />
-          </FormControl>
-
-          <FormControl mt={6}>
-            <FormLabel>Room Password (Default: abc)</FormLabel>
+            <FormLabel>Room Password</FormLabel>
             <Input
               type="password"
-              value={roomPassword}
-              onChange={(e) => setRoomPassword(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="* * * * * * *"
               _placeholder={{ color: "gray.500" }}
             />
           </FormControl>
-
           <Text
             fontSize={{ base: "sm", sm: "md" }}
             color={useColorModeValue("gray.800", "gray.400")}
             my="5"
           >
-            Create your room or{" "}
-            <Link color={"blue.400"} href="/joinroom">
-              Join another
+            Ask from room host or{" "}
+            <Link color={"blue.400"} href="/createroom">
+              Make your own room
             </Link>
           </Text>
-
           <Stack spacing={6}>
             <Button
               onClick={formSubmitEventHandler}
@@ -115,7 +95,7 @@ export default function CreateRoom(): JSX.Element {
                 bg: "blue.500",
               }}
             >
-              Create Room
+              Join Room
             </Button>
           </Stack>
         </form>

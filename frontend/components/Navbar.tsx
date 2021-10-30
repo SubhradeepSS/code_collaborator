@@ -11,8 +11,8 @@ import {
 import React, { ReactNode } from "react";
 import { ColorModeSwitch } from "./ColorModeSwitch";
 import { useAuth0 } from "@auth0/auth0-react";
-import LoginButton from "./LoginButton";
-import LogoutButton from "./LogoutButton";
+import LoginButton from "./auth/LoginButton";
+import LogoutButton from "./auth/LogoutButton";
 import NextLink from "next/link";
 
 const Links = [
