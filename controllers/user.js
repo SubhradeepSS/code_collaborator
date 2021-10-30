@@ -1,7 +1,7 @@
 const { User } = require('../models/user')
 
 const userSignUp =  (req, res) => {
-    User.sync({force:false}).then(() => {
+    User.sync({ force:false }).then(() => {
         const email = req.body.email
         const name = req.body.name
 
@@ -11,7 +11,9 @@ const userSignUp =  (req, res) => {
                 name
             }
         ]).then(() => {
-            res.status(200).json({ msg: 'User created in CockroachDB' })
+            res.status(201).json({ msg: 'User created in CockroachDB' })
+        }).catch(() => {
+            res.status(409).json({ msg: "User logging in through oauth - google" })
         })
     })
 }
