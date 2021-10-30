@@ -10,7 +10,6 @@ server.use(express.json());
 const PORT = 8080;
 
 
-server.use("/api", require('./routes/user'));
 server.use("/api", require('./routes/message'));
 server.use("/api", require('./routes/room'));
 
