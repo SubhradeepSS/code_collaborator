@@ -1,0 +1,33 @@
+{
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "nanoid": "^3.1.30",
+    "nodemon": "^2.0.14",
+    "pg": "latest",
+    "pg-connection-string": "latest",
+    "prompt": "latest",
+    "sequelize": "^6.8.0",
+    "sequelize-cockroachdb": "^6.0.3"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "code_collaborator",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SubhradeepSS/code_collaborator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SubhradeepSS/code_collaborator/issues"
+  },
+  "homepage": "https://github.com/SubhradeepSS/code_collaborator#readme",
+  "description": ""
+}
