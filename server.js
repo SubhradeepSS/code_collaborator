@@ -9,12 +9,10 @@ server.use(express.json());
 
 const PORT = 8080;
 
-// const roomRoutes = require("./routes/room");
-// const messageRoutes = require("./routes/messages");
 
-// server.use("/api", roomRoutes);
-// server.use("/api", messageRoutes);
-server.use("/api", require('./routes/userRoutes'));
+server.use("/api", require('./routes/user'));
+server.use("/api", require('./routes/message'));
+server.use("/api", require('./routes/room'));
 
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
