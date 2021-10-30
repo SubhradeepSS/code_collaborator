@@ -6,9 +6,20 @@ import {
   FormControl,
   FormLabel,
   Select,
+  Input,
   Text,
   SimpleGrid,
 } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
+
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -20,6 +31,8 @@ import { useDebouncedEffect } from "../../utils/useDebounceEffect";
 import { SERVER_URL } from "../../utils/constants";
 import { useAuth0 } from "@auth0/auth0-react";
 import Router from "next/router";
+import { WhatsappIcon } from "react-share";
+import { useDisclosure } from "@chakra-ui/react";
 
 const languages = [
   "c",
@@ -79,6 +92,8 @@ const fontSizes = [
 export default function CompilerCnntroller({ roomId }): JSX.Element {
   const { user } = useAuth0();
   // states
+
+  const [number, setnumber] = useState("");
   const [language, setLanguage] = useState<string>("python");
   const [theme, setTheme] = useState<string>("monokai");
   const [fontSize, setFontSize] = useState<string>("20");
@@ -88,6 +103,8 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
   const [statusId, setStatusId] = useState<String>("");
   const [status, setStatus] = useState<String>("idel");
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [data, setData] = useState({
     time: "0.00",
     result: "idel",
@@ -103,6 +120,16 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
   const router = useRouter();
   const { id } = router.query;
 
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => {
+    console.log("df");
+    setShow(true);
+  };
+
+  useEffect(() => {}, [show]);
+
   useEffect(() => {
     if (typeof window !== undefined) {
       const getCode = async () => {
@@ -114,6 +141,10 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
       getCode();
     }
   }, []);
+
+  const onShare = () => {
+    ServerApi.post("/api/shareCode", { phone: number, code: code });
+  };
 
   const onLeave = () => {
     ServerApi.post("/api/room/exitRoom", { email: user.email, roomId: id });
@@ -283,6 +314,40 @@ export default function CompilerCnntroller({ roomId }): JSX.Element {
         <Button colorScheme="red" variant="solid" onClick={onLeave}>
           Leave Room
         </Button>
+
+        <WhatsappIcon onClick={onOpen} size={42} round={true} />
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Modal Title</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {" "}
+              <FormControl mt={6}>
+                <FormLabel>Whatsapp Number</FormLabel>
+                <Input
+                  type="string"
+                  value={number}
+                  onChange={(e) => {
+                    setnumber(e.target.value);
+                  }}
+                  placeholder="Enter whatsapp number"
+                  _placeholder={{ color: "gray.500" }}
+                />
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button variant="ghost" onClick={onShare}>
+                Share
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </SimpleGrid>
 
       <hr />
