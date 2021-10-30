@@ -5,22 +5,23 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Grid,
-  GridItem,
   Select,
   Text,
+  SimpleGrid,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { API } from "../../utils/constants";
+import { API, ServerApi } from "../../utils/constants";
 import { Editor } from "./EditorComponent";
 import { useClipboard } from "@chakra-ui/react";
 import { SOCKET_IO } from "../../utils/constants";
 import { useDebouncedEffect } from "../../utils/useDebounceEffect";
 import { SERVER_URL } from "../../utils/constants";
+import { useAuth0 } from "@auth0/auth0-react";
+import Router from "next/router";
 
 const languages = [
   "c",
@@ -78,6 +79,7 @@ const fontSizes = [
 ];
 
 export default function CompilerCnntroller(): JSX.Element {
+  const { user } = useAuth0();
   // states
   const [language, setLanguage] = useState<string>("python");
   const [theme, setTheme] = useState<string>("monokai");
@@ -108,6 +110,11 @@ export default function CompilerCnntroller(): JSX.Element {
       setCode(localStorage.getItem("code"));
     }
   }, []);
+
+  const onLeave = () => {
+    ServerApi.post("/api/room/exitRoom", { email: user.email, roomId: id });
+    Router.push("/");
+  };
 
   // Run Program
   const getOutput = async (statusId: string | String) => {
@@ -192,95 +199,84 @@ export default function CompilerCnntroller(): JSX.Element {
   return (
     <>
       {/* Editor's Navbar- Controls */}
-      <div style={{ background: "", padding: "5px 0" }}>
-        <Wrap spacing="-10px" justify="space-around">
-          <WrapItem>
-            <FormControl>
-              <Center>
-                <FormLabel my="0">Choose Language</FormLabel>
-              </Center>
-              <Select
-                defaultValue={language}
-                minW="230px"
-                name="mode"
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                {languages.map((lang, index) => {
-                  return (
-                    <option key={index} value={lang}>
-                      {lang}
-                    </option>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </WrapItem>
-          <WrapItem>
-            <FormControl>
-              <Center>
-                <FormLabel my="0">Choose Theme</FormLabel>
-              </Center>
-              <Select
-                defaultValue={theme}
-                minW="230px"
-                name="theme"
-                onChange={(e) => setTheme(e.target.value)}
-              >
-                {themes.map((th) => (
-                  <option key={th} value={th}>
-                    {th}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </WrapItem>
 
-          <WrapItem>
-            <FormControl>
-              <Center>
-                <FormLabel my="0">Font Size</FormLabel>
-              </Center>
-              <Select
-                defaultValue={fontSize}
-                minW="150px"
-                name="fontSize"
-                onChange={(e) => setFontSize(e.target.value)}
-              >
-                {fontSizes.map((fSize, index) => {
-                  return (
-                    <option key={index} value={fSize}>
-                      {fSize}
-                    </option>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </WrapItem>
+      <SimpleGrid
+        minChildWidth="120px"
+        style={{ padding: "30px" }}
+        spacing="40px"
+      >
+        <FormControl>
           <Center>
-            <WrapItem>
-              <Button
-                colorScheme="teal"
-                variant="solid"
-                isLoading={isRunning}
-                loadingText="Running..."
-                onClick={onRun}
-              >
-                Save and Run
-              </Button>
-            </WrapItem>
+            <FormLabel my="0">Choose Language</FormLabel>
           </Center>
-          {/* <Center>
-                <WrapItem>Status : {status}</WrapItem>
-              </Center> */}
+          <Select
+            defaultValue={language}
+            name="mode"
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            {languages.map((lang, index) => {
+              return (
+                <option key={index} value={lang}>
+                  {lang}
+                </option>
+              );
+            })}
+          </Select>
+        </FormControl>
+        <FormControl>
           <Center>
-            <WrapItem>
-              <Button colorScheme="teal" variant="solid" onClick={onCopy}>
-                Copy Room Info
-              </Button>
-            </WrapItem>
+            <FormLabel my="0">Choose Theme</FormLabel>
           </Center>
-        </Wrap>
-      </div>
+          <Select
+            defaultValue={theme}
+            name="theme"
+            onChange={(e) => setTheme(e.target.value)}
+          >
+            {themes.map((th) => (
+              <option key={th} value={th}>
+                {th}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <Center>
+            <FormLabel my="0">Font Size</FormLabel>
+          </Center>
+          <Select
+            defaultValue={fontSize}
+            name="fontSize"
+            onChange={(e) => setFontSize(e.target.value)}
+          >
+            {fontSizes.map((fSize, index) => {
+              return (
+                <option key={index} value={fSize}>
+                  {fSize}
+                </option>
+              );
+            })}
+          </Select>
+        </FormControl>
+
+        <Button
+          colorScheme="teal"
+          variant="solid"
+          isLoading={isRunning}
+          loadingText="Running..."
+          onClick={onRun}
+        >
+          Save and Run
+        </Button>
+
+        <Button colorScheme="teal" variant="solid" onClick={onCopy}>
+          Copy RoomInfo
+        </Button>
+
+        <Button colorScheme="red" variant="solid" onClick={onLeave}>
+          Leave Room
+        </Button>
+      </SimpleGrid>
+
       <hr />
 
       {/* Editor with Input and Output section */}
@@ -300,7 +296,7 @@ export default function CompilerCnntroller(): JSX.Element {
                   // SOCKET_IO.emit("editor", code);
                 }}
                 height={"69vh"}
-                width={"44vw"}
+                width={"40vw"}
                 fontSize={parseInt(fontSize, 10)}
                 setOptions={{
                   enableBasicAutocompletion: true,
@@ -321,7 +317,7 @@ export default function CompilerCnntroller(): JSX.Element {
                 ]}
               />
             </Box>
-            <Box p={4}>
+            <Box p={8}>
               <Box mb={4}>
                 <Text>Input</Text>
                 <Editor
