@@ -7,7 +7,7 @@ const shareWhatsApp = (req, res) => {
             .create({
                 from: 'whatsapp:+14155238886',
                 body: req.body.code,
-                to: 'whatsapp:+919436946555'
+                to: `whatsapp:${req.body.phone}`
             })
             .then(() => {
                 res.status(200).json("Sent to whatsapp")
