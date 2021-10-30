@@ -3,19 +3,21 @@ const Sequelize = require("sequelize-cockroachdb");
  
 // For secure connection to CockroachDB
 const fs = require('fs');
- 
+
+const { username, password, host, port, database, cert_path } = require('../config')
+
 // Connect to CockroachDB through Sequelize
 const sequelize = new Sequelize({
     dialect: "postgres",
-    username: "code_collaborator",
-    password: "c6yGH1ocrPBgruaY",
-    host: "free-tier8.aws-ap-southeast-1.cockroachlabs.cloud",
-    port: 26257,
-    database: "yellow-vole-471.hack_orm",
+    username,
+    password,
+    host,
+    port,
+    database,
     dialectOptions: {
       ssl: {
         //For secure connection:
-        ca: fs.readFileSync(`${process.env.APPDATA}\\.postgresql\\root.crt`)
+        ca: fs.readFileSync(cert_path)
                .toString()
       },
     },

@@ -12,6 +12,7 @@ const PORT = 8080;
 
 server.use("/api", require('./routes/message'));
 server.use("/api", require('./routes/room'));
+server.use("/api", require('./routes/share'));
 
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
