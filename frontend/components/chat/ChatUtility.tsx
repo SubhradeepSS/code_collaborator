@@ -69,7 +69,7 @@ export const ChatUtility: React.FC<ChatUtilityProps> = ({
       {messages.map((msg, i) => {
         return (
           <Box
-            bg="facebook.200"
+            bg="blue.100"
             w="100%"
             p={4}
             color="white"
@@ -78,7 +78,6 @@ export const ChatUtility: React.FC<ChatUtilityProps> = ({
             key={msg._id}
           >
             <Flex>
-              {console.log(msg)}
               <Box color="facebook.800">{msg.senderName}</Box>
               <Box color="facebook.800" ml={4}>
                 {format(msg.createdAt)}

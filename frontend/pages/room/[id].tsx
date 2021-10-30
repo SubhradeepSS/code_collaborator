@@ -42,13 +42,17 @@ const Room = (props) => {
   return (
     <div>
       <Navbar />
-      <Grid templateRows="repeat(1, 1fr)" templateColumns="repeat(10, 1fr)">
-        <GridItem colSpan={chatSize} colStart={11} bg="tsizeomato">
-          <div onClick={manageSize}>
-            <ChatButton></ChatButton>
-          </div>
-        </GridItem>
-      </Grid>
+      <br />
+      <div
+        style={{
+          position: "absolute",
+          right: "1.5em",
+          top: "4.5em",
+        }}
+        onClick={manageSize}
+      >
+        <ChatButton></ChatButton>
+      </div>
 
       <Grid
         h="80vh"
@@ -68,14 +72,11 @@ const Room = (props) => {
               p="20px"
               backgroundColor="whiteAlpha.400"
               style={{
-                maxHeight: "65vh",
                 overflow: "scroll",
                 overflowX: "hidden",
               }}
             >
-              <div suppressHydrationWarning={true}>
-                {process.browser && <Chat roomId={id as string} />}
-              </div>
+              {process.browser && <Chat roomId={id as string} />}
             </Box>
           ) : null}
         </GridItem>
