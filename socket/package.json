@@ -23,7 +23,7 @@
     "express": "^4.17.1",
     "moment": "^2.29.2",
     "mongoose": "^5.13.5",
-    "nanoid": "^3.1.23",
+    "nanoid": "^3.1.31",
     "nodemon": "^2.0.14",
     "socket.io": "^4.1.3"
   }
